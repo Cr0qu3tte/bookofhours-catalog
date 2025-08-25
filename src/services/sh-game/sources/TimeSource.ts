@@ -166,12 +166,25 @@ export class TimeSource {
     // Tick past daybreak, to one tick past the end of the day to start the new one.
     // Note: The api mod takes into account recipe timers and incrementally passes time around them so that all recipes
     // execute as intended, despite the significant time gap we are jumping.
-    // TODO: What is the exact delay we need for weather to show up?  Came up with +7 by trial and error.
-    // Note: Then tweaked to +8 because +7 wasnt working.  Patch change?
+    // adding 8 seconds to account for daybreak (2s) and drawing the weather (6s)
     await this._api.passTime(time + 8 + 0.1);
     // Re-pause, as daybreak will have reset the game speed.
     await this._api.setSpeed("Paused");
     this._scheduler.updateNow();
+  }
+
+  async passToNextPeriod() {
+      const remainingTime = await firstValueFrom(this.secondsUntilTomorrow$);
+      // each period of the day takes up to 60s. Passing the remaining time for the current period (+0.1 to begin the next one)
+      let timeToSkip = remainingTime % 60 + 0.1;
+      // if the next period is dawn, we add 8 seconds for daybreak (2s) and drawing the weather (6s)
+      if (remainingTime < 60) {
+          timeToSkip += 8;
+      }
+      await this._api.passTime(timeToSkip);
+      // Re-pause in case we pass daybreak, otherwise it may have reset the game speed
+      await this._api.setSpeed("Paused");
+      this._scheduler.updateNow();
   }
 
   private async _pollTime() {
