@@ -17,15 +17,25 @@ import { WisdomNodeTerrainModel } from "./WisdomNodeTerrainModel";
 @injectable()
 @singleton()
 export class TokenModelFactory {
+  // Lazy loading TokensSource to prevent circular dependency
+  private _tokensSourceCached: TokensSource | null = null;
+
   constructor(
     @inject(API) private readonly _api: API,
     @inject(Compendium) private readonly _compendium: Compendium,
-    @inject(TokensSource) private readonly _tokensSource: TokensSource,
+    @inject(Container) private readonly _container: Container,
     @inject(BatchingScheduler)
     private readonly _batchingScheduler: BatchingScheduler,
     @inject(TokenParentTerrainFactory)
     private readonly _tokenParentTerrainFactory: TokenParentTerrainFactory,
   ) {}
+
+  private get _tokensSource(): TokensSource {
+    if (!this._tokensSourceCached) {
+      this._tokensSourceCached = this._container.get(TokensSource);
+    }
+    return this._tokensSourceCached;
+  }
 
   create(token: Token): TokenModel {
     switch (token.payloadType) {
