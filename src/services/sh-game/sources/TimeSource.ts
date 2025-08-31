@@ -95,7 +95,7 @@ export class TimeSource {
             return Number.NaN;
           }
 
-          timeRemaining += situation.timeRemaining + 8;
+          timeRemaining += situation.timeRemaining;
           return timeRemaining;
         }),
         distinctUntilChanged(),

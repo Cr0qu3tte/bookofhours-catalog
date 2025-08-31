@@ -25,8 +25,10 @@ const SeasonAndTimeHeader = ({ sx }: SeasonAndTimeHeaderProps) => {
   const seasonDescription = useObservation(timeSource.seasonDescription$);
   const daysInSeason = useObservation(timeSource.daysUntilNextSeason$);
 
-  const secondsToTomorrow =
+  let secondsToTomorrow =
     useObservation(timeSource.secondsUntilTomorrow$) ?? Number.NaN;
+  //Adding 8s to account for the weather card drawing
+  secondsToTomorrow += 8;
   const secondsToTomorrowStr = secondsToTomorrow.toFixed(
     secondsToTomorrow > 60 ? 0 : 1
   );

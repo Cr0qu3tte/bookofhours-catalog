@@ -62,11 +62,8 @@ const OrchestrationListContent = () => {
     ) ?? [];
 
   const timeSource = useDIDependency(TimeSource);
-  const secondsToTomorrow =
+  let secondsToTomorrow =
     useObservation(timeSource.secondsUntilTomorrow$) ?? Number.NaN;
-  const secondsToTomorrowStr = secondsToTomorrow.toFixed(
-    secondsToTomorrow > 60 ? 0 : 1
-  );
   const dayPeriodNames: string[] = [
     "Dawn",
     "Morning",
@@ -83,6 +80,12 @@ const OrchestrationListContent = () => {
       nextPeriodIndex = 0;
   }
   const nextPeriodName = dayPeriodNames[nextPeriodIndex];
+
+  //Adding 8s to account for the weather card drawing
+  secondsToTomorrow += 8;
+  const secondsToTomorrowStr = secondsToTomorrow.toFixed(
+    secondsToTomorrow > 60 ? 0 : 1
+  );
 
   return (
     <Stack direction="column">
