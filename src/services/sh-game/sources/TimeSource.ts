@@ -95,7 +95,7 @@ export class TimeSource {
             return Number.NaN;
           }
 
-          timeRemaining += situation.timeRemaining;
+          timeRemaining += situation.timeRemaining + 8;
           return timeRemaining;
         }),
         distinctUntilChanged(),
@@ -176,13 +176,9 @@ export class TimeSource {
   async passToNextPeriod() {
       const remainingTime = await firstValueFrom(this.secondsUntilTomorrow$);
       // each period of the day takes up to 60s. Passing the remaining time for the current period (+0.1 to begin the next one)
-      let timeToSkip = remainingTime % 60 + 0.1;
-      // if the next period is dawn, we add 8 seconds for daybreak (2s) and drawing the weather (6s)
-      if (remainingTime < 60) {
-          timeToSkip += 8;
-      }
+      let timeToSkip = (remainingTime % 60) + 0.1;
       await this._api.passTime(timeToSkip);
-      // Re-pause in case we pass daybreak, otherwise it may have reset the game speed
+      // Re-pause, as daybreak may have reset the game speed.
       await this._api.setSpeed("Paused");
       this._scheduler.updateNow();
   }

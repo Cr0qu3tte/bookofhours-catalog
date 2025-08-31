@@ -80,7 +80,6 @@ const OrchestrationListContent = () => {
   let nextPeriodIndex = Math.ceil((360 - secondsToTomorrow) / 60);
   // if next period is after Night, we loop to Dawn
   if (nextPeriodIndex >= dayPeriodNames.length) {
-      secondsToNextPeriod += 8;
       nextPeriodIndex = 0;
   }
   const nextPeriodName = dayPeriodNames[nextPeriodIndex];
@@ -189,7 +188,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
       e.stopPropagation();
       if (state === "Ongoing") {
         // Tick one tick past the end of the situation, so we dont hang on 0.0
-        timeSource.passTime(timeRemaining + 0.1);
+        timeSource.passTime(situation.timeRemaining + 0.1);
       } else if (state === "Complete") {
         situation.conclude();
       }
