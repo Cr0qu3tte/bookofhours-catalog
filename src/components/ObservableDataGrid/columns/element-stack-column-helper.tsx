@@ -17,6 +17,7 @@ import {
   AspectsFilter,
   aspectsFilter,
   multiSelectFilter,
+  FilterComponentProps,
 } from "../filters";
 
 import { AspectsListCell, TextWrapCell } from "../cells";
@@ -27,7 +28,7 @@ import { EnhancedColumnDefBase } from "../types";
 import { createObservableColumnHelper } from "./observable-column-helper";
 
 export function createElementStackColumnHelper<
-  T extends ElementStackModel = ElementStackModel
+  T extends ElementStackModel = ElementStackModel,
 >() {
   const columnHelper = createObservableColumnHelper<T>();
   return Object.assign(columnHelper, {
@@ -39,7 +40,7 @@ export function createElementStackColumnHelper<
         rowHeader: true,
         ...def,
       }),
-    elementStackIcon: () =>
+    elementStackIcon: (columnName: string = "Icon") =>
       columnHelper.display({
         id: "icon",
         header: "",
@@ -55,6 +56,9 @@ export function createElementStackColumnHelper<
             elementStack={undecorateObjectInstance(context.row.original)}
           />
         ),
+        meta: {
+          columnName,
+        },
       }),
     aspectsList: (
       id: string,
@@ -66,9 +70,9 @@ export function createElementStackColumnHelper<
       }: Partial<EnhancedColumnDefBase<T, Record<string, React.ReactNode>>> & {
         showLevel?: boolean;
         aspectsSource?: (
-          model: T
+          model: T,
         ) => Observable<Record<string, React.ReactNode>>;
-      } = {}
+      } = {},
     ) =>
       columnHelper.observe(
         (model) =>
@@ -80,7 +84,7 @@ export function createElementStackColumnHelper<
                 return pick(modelAspects, aspects);
               }
             }),
-            distinctUntilChanged(isEqual)
+            distinctUntilChanged(isEqual),
           ),
         {
           id,
@@ -92,7 +96,7 @@ export function createElementStackColumnHelper<
             aspectsMagnitude(b.getValue(columnId)),
           filterFn: aspectsFilter,
           meta: {
-            filterComponent: (props) => (
+            filterComponent: (props: FilterComponentProps) => (
               <AspectsFilter
                 allowedAspectIds={
                   typeof aspects === "function" ? "auto" : aspects
@@ -102,7 +106,7 @@ export function createElementStackColumnHelper<
             ),
           },
           ...def,
-        }
+        },
       ),
     description: () =>
       columnHelper.observeText("description$" as any, {
@@ -115,7 +119,7 @@ export function createElementStackColumnHelper<
       columnHelper.observe(
         (item) =>
           item.parentTerrain$.pipe(
-            switchMapIfNotNull((terrain) => terrain.label$)
+            switchMapIfNotNull((terrain) => terrain.label$),
           ),
         {
           id: "location",
@@ -124,12 +128,12 @@ export function createElementStackColumnHelper<
           cell: TextWrapCell,
           filterFn: multiSelectFilter,
           meta: {
-            filterComponent: (props) => {
+            filterComponent: (props: FilterComponentProps) => {
               const locations = useUnlockedLocationLabels() ?? [];
               return <MultiselectFilter allowedValues={locations} {...props} />;
             },
           },
-        }
+        },
       ),
   });
 }

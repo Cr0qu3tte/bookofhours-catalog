@@ -54,7 +54,7 @@ const AspectsMultiSelectList: React.FC<AspectsMultiSelectListProps> = ({
         onChange([...value, aspect]);
       }
     },
-    [value, onChange]
+    [value, onChange],
   );
 
   const itemModels$ = useValueObservation(itemModels);
@@ -73,13 +73,13 @@ const AspectsMultiSelectList: React.FC<AspectsMultiSelectListProps> = ({
                   }
 
                   return label.toLowerCase().includes(search.toLowerCase());
-                })
-              )
-            )
-          )
-        )
+                }),
+              ),
+            ),
+          ),
+        ),
       ),
-    [itemModels$, searchValue$]
+    [itemModels$, searchValue$],
   );
 
   const currentItemModels = useObservation(currentItemModels$) ?? EmptyArray;
@@ -94,7 +94,7 @@ const AspectsMultiSelectList: React.FC<AspectsMultiSelectListProps> = ({
           onClick={() => toggleAspect(aspect.aspectId)}
         />
       )),
-    [currentItemModels, value, toggleAspect]
+    [currentItemModels, value, toggleAspect],
   );
 
   return (
@@ -145,7 +145,11 @@ const AspectsMultiSelectItem: React.FC<AspectsMultiSelectItemProps> = ({
             checked={selected}
             tabIndex={-1}
             disableRipple
-            inputProps={{ "aria-labelledby": id }}
+            slotProps={{
+              input: {
+                "aria-labelledby": id,
+              },
+            }}
           />
         </ListItemIcon>
         <ListItemText id={id} primary={label ?? aspect} />

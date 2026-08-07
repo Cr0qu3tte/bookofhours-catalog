@@ -13,7 +13,15 @@ const AppRouter = ({ children }: AppRouterProps) => {
     location: history.location,
   });
 
-  React.useLayoutEffect(() => history.listen(setState), [history]);
+  React.useLayoutEffect(
+    () =>
+      history.listen((state) => {
+        React.startTransition(() => {
+          setState(state);
+        });
+      }),
+    [history],
+  );
 
   return (
     <Router

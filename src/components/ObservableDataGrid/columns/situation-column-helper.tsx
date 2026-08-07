@@ -14,6 +14,7 @@ import {
   aspectsFilter,
   TextFilter,
   multiSelectFilter,
+  FilterComponentProps,
 } from "../filters";
 import { EnhancedColumnDefBase } from "../types";
 
@@ -22,7 +23,7 @@ import { AspectsListCell, TextWrapCell, VerbIconCell } from "../cells";
 import { createObservableColumnHelper } from "./observable-column-helper";
 
 export function createSituationColumnHelper<
-  T extends SituationModel = SituationModel
+  T extends SituationModel = SituationModel,
 >() {
   const columnHelper = createObservableColumnHelper<T>();
   return Object.assign(columnHelper, {
@@ -39,13 +40,16 @@ export function createSituationColumnHelper<
         },
         ...def,
       }),
-    verbIcon: () =>
+    verbIcon: (columnName: string = "Icon") =>
       columnHelper.observe("verbId$" as any, {
         id: "icon",
         header: "",
         size: 100,
         enableSorting: false,
         enableColumnFilter: false,
+        meta: {
+          columnName,
+        },
         cell: VerbIconCell,
       }),
     aspectsList: (
@@ -58,9 +62,9 @@ export function createSituationColumnHelper<
       }: Partial<EnhancedColumnDefBase<T, Record<string, React.ReactNode>>> & {
         showLevel?: boolean;
         aspectsSource?: (
-          model: T
+          model: T,
         ) => Observable<Record<string, React.ReactNode>>;
-      } = {}
+      } = {},
     ) =>
       columnHelper.observe(
         (model) =>
@@ -71,7 +75,7 @@ export function createSituationColumnHelper<
               } else {
                 return pick(modelAspects, aspects);
               }
-            })
+            }),
           ),
         {
           id,
@@ -83,7 +87,7 @@ export function createSituationColumnHelper<
             aspectsMagnitude(b.getValue(columnId)),
           filterFn: aspectsFilter,
           meta: {
-            filterComponent: (props) => (
+            filterComponent: (props: FilterComponentProps) => (
               <AspectsFilter
                 allowedAspectIds={
                   typeof aspects === "function" ? "auto" : aspects
@@ -93,7 +97,7 @@ export function createSituationColumnHelper<
             ),
           },
           ...def,
-        }
+        },
       ),
     description: () =>
       columnHelper.observe("verbDescription$" as any, {
@@ -111,7 +115,7 @@ export function createSituationColumnHelper<
       columnHelper.observe(
         (item) =>
           item.parentTerrain$.pipe(
-            switchMapIfNotNull((terrain) => terrain.label$)
+            switchMapIfNotNull((terrain) => terrain.label$),
           ),
         {
           id: "location",
@@ -120,12 +124,12 @@ export function createSituationColumnHelper<
           cell: TextWrapCell,
           filterFn: multiSelectFilter,
           meta: {
-            filterComponent: (props) => {
+            filterComponent: (props: FilterComponentProps) => {
               const locations = useUnlockedLocationLabels() ?? [];
               return <MultiselectFilter allowedValues={locations} {...props} />;
             },
           },
-        }
+        },
       ),
   });
 }

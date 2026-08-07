@@ -56,9 +56,9 @@ const OrchestrationListContent = () => {
     useObservation(
       () =>
         orchestrator.executingSituations$.pipe(
-          filterTokenNotInPath("~/fixedverbs")
+          filterTokenNotInPath("~/fixedverbs"),
         ),
-      [orchestrator.executingSituations$]
+      [orchestrator.executingSituations$],
     ) ?? [];
 
   const timeSource = useDIDependency(TimeSource);
@@ -84,7 +84,7 @@ const OrchestrationListContent = () => {
   //Adding 8s to account for the weather card drawing
   secondsToTomorrow += 8;
   const secondsToTomorrowStr = secondsToTomorrow.toFixed(
-    secondsToTomorrow > 60 ? 0 : 1
+    secondsToTomorrow > 60 ? 0 : 1,
   );
 
   return (
@@ -180,9 +180,9 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
   const hasEmptyThresholds = useObservation(
     () =>
       situation.thresholdContents$.pipe(
-        map((contents) => values(contents).some((x) => x === null))
+        map((contents) => values(contents).some((x) => x === null)),
       ),
-    [situation]
+    [situation],
   );
 
   const onAltAction = React.useCallback(
@@ -196,7 +196,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
         situation.conclude();
       }
     },
-    [state, situation, timeSource]
+    [state, situation, timeSource],
   );
 
   const onClick = React.useCallback(
@@ -211,7 +211,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
 
       orchestrator.openOrchestration({ situation });
     },
-    [orchestrator, onAltAction]
+    [orchestrator, onAltAction],
   );
 
   const [{ isOver, canDrop }, dropRef] = useDrop(
@@ -229,7 +229,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
 
         // FIXME: Make sure there is a slot that is empty.
         return thresholds.some((spec) =>
-          aspectsMatchRequirements(item.elementStack.aspects, spec)
+          aspectsMatchRequirements(item.elementStack.aspects, spec),
         );
       },
       async drop(item, monitor) {
@@ -249,11 +249,13 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
 
         const slots = await firstValueFrom(
           orchestration.slots$.pipe(
-            filterItemObservations((slot) => slot.assignment$.pipe(map(isNull)))
-          )
+            filterItemObservations((slot) =>
+              slot.assignment$.pipe(map(isNull)),
+            ),
+          ),
         );
         const match = values(slots).find((slot) =>
-          aspectsMatchRequirements(item.elementStack.aspects, slot.spec)
+          aspectsMatchRequirements(item.elementStack.aspects, slot.spec),
         );
         if (!match) {
           return;
@@ -268,7 +270,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
         };
       },
     },
-    [thresholds, state]
+    [thresholds, state],
   );
 
   if (state !== "Unstarted" && state !== "Ongoing" && state !== "Complete") {

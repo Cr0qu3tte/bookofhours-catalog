@@ -1,6 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router";
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router";
 import {
   Divider,
   Box,
@@ -12,6 +11,8 @@ import {
 } from "@mui/material";
 import { GitHub as GithubIcon } from "@mui/icons-material";
 
+import { repositoryUrl } from "@/github";
+
 import SixthHistoryIcon from "@/assets/icons/sixthhistory.svg?react";
 
 import sitemap, {
@@ -20,8 +21,8 @@ import sitemap, {
   isSiteMapDividerItem,
   isSiteMapNavItem,
 } from "@/sitemap";
+
 import LicenseDialog from "./LicenseDialog";
-import { repositoryUrl } from "@/github";
 
 const PageTabs = () => {
   const [licenseOpen, setLicenseOpen] = React.useState(false);
@@ -76,7 +77,12 @@ const PageTabs = () => {
       </Tooltip>
       <Tooltip
         title="View Project on Github"
-        PopperProps={{ sx: { pointerEvents: "none" }, placement: "right" }}
+        slotProps={{
+          popper: {
+            sx: { pointerEvents: "none" },
+            placement: "right",
+          },
+        }}
       >
         <MuiLink
           href={repositoryUrl}
@@ -104,7 +110,9 @@ const PageTab = ({ item }: PageTab) => {
   return (
     <Tooltip
       title={<Typography variant="body1">{label}</Typography>}
-      PopperProps={{ sx: { pointerEvents: "none" }, placement: "right" }}
+      slotProps={{
+        popper: { sx: { pointerEvents: "none" }, placement: "right" },
+      }}
     >
       <Link key={path} to={path}>
         <Box

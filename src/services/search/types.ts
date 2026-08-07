@@ -27,12 +27,12 @@ export interface SearchItemResult {
   label: string;
   secondaryText?: string;
   path: string;
-  actions?: React.ReactNode[];
+  actions?: React.ReactElement[];
 }
 
 export type SearchProviderPipe = (
   query: Observable<SearchQuery>,
-  container: Container
+  container: Container,
 ) => Observable<readonly SearchItemResult[]>;
 
 export interface PageSearchItemResult extends Omit<SearchItemResult, "path"> {
@@ -41,5 +41,5 @@ export interface PageSearchItemResult extends Omit<SearchItemResult, "path"> {
 
 export type PageSearchProviderPipe = (
   query: Observable<SearchQuery>,
-  container: Container
+  container: Container,
 ) => Observable<readonly PageSearchItemResult[]>;

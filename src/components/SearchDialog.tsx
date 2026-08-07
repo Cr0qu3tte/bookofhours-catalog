@@ -13,7 +13,6 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
 
@@ -62,7 +61,7 @@ const SearchDialog = () => {
 
       navigate(firstItem.path);
     },
-    [searchService, firstItem ?? null]
+    [searchService, firstItem ?? null],
   );
 
   if (!isOpen) {
@@ -72,9 +71,11 @@ const SearchDialog = () => {
   return (
     <Dialog
       open
-      PaperProps={{
-        "aria-model": "true",
-        role: "document",
+      slotProps={{
+        paper: {
+          "aria-modal": "true",
+          role: "document",
+        },
       }}
       aria-label="Search"
       onClose={() => searchService.close()}
@@ -154,18 +155,16 @@ const SearchDialog = () => {
           </Typography>
         )}
 
-        {!isBusy && searchQuery != "" && (
+        {!isBusy && searchQuery != "" && searchTotal != null && (
           <>
-            {searchResults && searchTotal && (
-              <Typography
-                component="div"
-                sx={{ width: "100%" }}
-                textAlign="center"
-                variant="caption"
-              >
-                Showing {searchResults.length} of {searchTotal} items
-              </Typography>
-            )}
+            <Typography
+              component="div"
+              sx={{ width: "100%" }}
+              textAlign="center"
+              variant="caption"
+            >
+              Showing {searchResults.length} of {searchTotal} items
+            </Typography>
             <List component="nav" sx={{ pt: 1 }}>
               {searchResults.map((item, i) => (
                 <SearchResultListItem key={i} item={item} />
@@ -179,7 +178,7 @@ const SearchDialog = () => {
 };
 
 const SearchResultListItem = ({ item }: { item: SearchItemResult }) => {
-  const { iconUrl, label, path, secondaryText } = item;
+  const { iconUrl, label, path, secondaryText, actions } = item;
 
   const navigate = useNavigate();
   const searchService = useDIDependency(SearchService);
@@ -188,19 +187,22 @@ const SearchResultListItem = ({ item }: { item: SearchItemResult }) => {
 
   const onClick = React.useCallback(
     (e: React.MouseEvent) => {
+      if (e.defaultPrevented) {
+        return;
+      }
       e.preventDefault();
       e.stopPropagation();
       searchService.close();
       navigate(path);
     },
-    [path, searchService, navigate]
+    [path, searchService, navigate],
   );
 
-  let actions: React.ReactNode | null = null;
-  if (item.actions) {
-    actions = (
+  let actionsStack: React.ReactNode | null = null;
+  if (actions) {
+    actionsStack = (
       <Stack direction="row" sx={{ ml: "auto" }}>
-        {item.actions}
+        {actions.map((action, i) => React.cloneElement(action, { key: i }))}
       </Stack>
     );
   }
@@ -219,7 +221,7 @@ const SearchResultListItem = ({ item }: { item: SearchItemResult }) => {
         />
       </ListItemIcon>
       <ListItemText primary={label} secondary={secondaryText} />
-      {actions}
+      {actionsStack}
     </ListItemButton>
   );
 };

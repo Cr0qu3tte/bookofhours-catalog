@@ -21,9 +21,9 @@ const MaterialsCatalogPage = () => {
     // Much more than just materials.  This is whatever I find useful to Make Things With
     () =>
       tokensSource.visibleElementStacks$.pipe(
-        filterHasAnyAspect(materialAspects)
+        filterHasAnyAspect(materialAspects),
       ),
-    [tokensSource]
+    [tokensSource],
   );
 
   const columns = React.useMemo(
@@ -32,6 +32,9 @@ const MaterialsCatalogPage = () => {
         id: "focus-button",
         header: "",
         size: 50,
+        meta: {
+          columnName: "Focus",
+        },
         cell: ({ row }) => (
           <Box
             sx={{
@@ -57,7 +60,7 @@ const MaterialsCatalogPage = () => {
       }),
       columnHelper.description(),
     ],
-    []
+    [],
   );
 
   return (

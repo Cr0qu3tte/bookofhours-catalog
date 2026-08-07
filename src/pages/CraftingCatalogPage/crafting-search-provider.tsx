@@ -2,6 +2,8 @@ import React from "react";
 
 import { Observable, combineLatest, filter, map, switchMap } from "rxjs";
 
+import { isNotNull } from "@/utils";
+
 import { filterItemObservations, observeAllMap } from "@/observables";
 
 import {
@@ -11,30 +13,30 @@ import {
   SearchQuery,
 } from "@/services/search";
 
+import OrchestrationIconButton from "@/components/OrchestrationIconButton";
+
 import {
   CraftableModel,
   getCraftablesObservable,
 } from "./crafting-data-source";
-import { isNotNull } from "@/utils";
-import OrchestrationIconButton from "@/components/OrchestrationIconButton";
 
 export const craftingSearchProvider: PageSearchProviderPipe = (
   query$,
-  container
+  container,
 ) => {
   return query$.pipe(
     switchMap((query) =>
       getCraftablesObservable(container).pipe(
         filterItemObservations((item) => filterCraftableToQuery(query, item)),
-        observeAllMap(craftableModelToSearchItem)
-      )
-    )
+        observeAllMap(craftableModelToSearchItem),
+      ),
+    ),
   );
 };
 
 function filterCraftableToQuery(
   query: SearchQuery,
-  craftable: CraftableModel
+  craftable: CraftableModel,
 ): Observable<boolean> {
   return combineLatest([
     craftable.label$,
@@ -47,12 +49,12 @@ function filterCraftableToQuery(
         freeText: [label, skillLabel, description].filter(isNotNull),
         aspects,
       });
-    })
+    }),
   );
 }
 
 function craftableModelToSearchItem(
-  craftable: CraftableModel
+  craftable: CraftableModel,
 ): Observable<PageSearchItemResult> {
   return combineLatest([
     craftable.iconUrl$,
@@ -60,7 +62,7 @@ function craftableModelToSearchItem(
     craftable.skillLabel$,
   ]).pipe(
     filter(
-      ([iconUrl, label, skillLabel]) => !!iconUrl && !!label && !!skillLabel
+      ([iconUrl, label, skillLabel]) => !!iconUrl && !!label && !!skillLabel,
     ),
     map(
       ([iconUrl, label, skillLabel]) =>
@@ -75,7 +77,7 @@ function craftableModelToSearchItem(
               onClick={() => craftable.craft()}
             />,
           ],
-        } satisfies PageSearchItemResult)
-    )
+        }) satisfies PageSearchItemResult,
+    ),
   );
 }

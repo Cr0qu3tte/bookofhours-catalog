@@ -39,6 +39,18 @@ This project provides two zip files depending on your situation:
     - This should result in a BepInEx folder and a `winhttp.dll` file in your Book of Hours directory.
     - You should NOT see a folder called "Hush.House.Catalogue.Quickstart" in your Book of Hours directory. Some zip tools will create this folder when extracting the zip. If you see this, copy the contents of that folder back into your Book of Hours folder, and delete the "Hush.House.Catalogue.Quickstart" folder afterwards.
 
+### Linux and Mac users
+
+Do not use the Quickstart.
+
+- Install the 64 bit version of BepInEx 5.x for your operating system [using the official instructions](https://docs.bepinex.dev/articles/user_guide/installation/index.html).
+- Run the game once, to generate the config file.
+  - Note: You will need to run the game by the `run_bepinex.sh` script provided by BepInEx.
+- Go to `steamapps/common/Book Of Hours/BepInEx/config`, edit `BepInEx.cfg`, and change `HideManagerGameObject = false` to `HideManagerGameObject = true`
+- Install the BepInEx.Plugin package from this mod.
+
+Note that some games require you to install the Windows version of BepInEx regardless of your operating system, but Book of Hours is not one of them.
+
 ## Usage
 
 This project is best used in the browser of your choice while the game runs in windowed mode. However, the website can also be accessed from the Steam Overlay if you prefer to run the game in fullscreen.
@@ -58,14 +70,25 @@ When enabled, there are two options for how much interactivity to provide:
 - Minimal mode lets you control verbs and workstations and start recipes through the Activites Panel, but provides no help in doing so. To run a recipe, you need to choose the workstation and cards to do so.
 - Full mode adds automatic recipe execution for things like reading books and crafting items from skills. With this mode, the Catalogue provides the option of automatically choosing an appropriate workstation and slotting the appropriate cards for crafting the recipe. It should be noted that the only crafting recipes it will let you autocomplete are the recipes you have already discovered and unlocked on your own.
 
+## Troubleshooting
+
+Check the [Player.log](#playerlog):
+
+- If you do **not** see `[Message:   BepInEx] BepInEx 5.4.23.4 - bh (9/26/2025 5:17:09 PM)` or something similar, ensure BepInEx is installed correctly for your operating system.
+- If you see the above, but do **not** see `[Info   :Secret Histories RESTAPI] Secret Histories RESTAPI BepnEx plugin loaded.`, ensure this mod is properly installed in the right BepInEx plugin folder.
+  - Particularly, check for folders-in-folders; the dlls should be in `Book of Hours/BepInEx/plugins/SHRest`, not in sub-folders of that path.
+- If you see `SHRestAPI bep plugin destroyed`, set `HideManagerGameObject` to true in the BepInEx config.
+
 ## Support
 
 If you are having issues getting this mod to work, support is offered in two places:
 
 - In the [Github Issues](https://github.com/SunsetFi/bookofhours-catalog/issues) page for this project.
-- In the [Cultist Simulator fan discord](https://discord.gg/KxyFTZkUbQ), by pinging me (SunsetFi) in the #mod-development channel.
+- In the [Cultist Simulator fan discord](https://discord.gg/KxyFTZkUbQ), by pinging @SunsetFi in the #mod-development channel.
 
-In order to diagnose issues, I will need the `Player.log` log file from your game. On Windows, this is found at `C:\Users\<username>\AppData\LocalLow\Weather Factory\Book of Hours\Player.log`
+### Player.log
+
+In order to diagnose issues, I will need the `Player.log` log file from your game. On Windows, this is found at `C:\Users\<username>\AppData\LocalLow\Weather Factory\Book of Hours\Player.log`. On Linux, this is found at `~/.config/unity3d/Weather Factory/Book of Hours/Player.log`
 
 ## Features
 
@@ -434,19 +457,23 @@ Displays comforts and wall art around the house. This is an esoteric assortment 
 This project requires [Secret Histories API](https://github.com/SunsetFi/secrethistories-api-mod/) to be installed in Book of Hours. Without it, this project cannot access the game engine and will be unable
 to display any data.
 
-### Building the project
-
 This project uses [NodeJS](https://nodejs.org) as a build engine.
 
-Once installed, the project dependencies can be installed with `npm install`, and the project itself can be built with `npm run build`.
+This project manages packages using [PNPM](https://pnpm.io/)
+
+### Building the project
+
+Use `pnpm build` to build the web portion of this project.
+
+Built content should be copied to `BepInEx/plugins/SHRest/web-content/catalogue`.
 
 ### How to run locally
 
-This project can be ran in one of two ways:
+This project can be ran locally in one of two ways:
 
 #### From the dev server
 
-Run `npm start` in the root folder of the project to compile and run the webapp. It will then be available at `http://localhost:8080/catalogue`
+Run `pnpm start` in the root folder of the project to compile and run the webapp. It will then be available at `http://localhost:8080/catalogue`
 
 #### From the Secret Histories API
 

@@ -20,9 +20,9 @@ const FurnishingsCatalogPage = () => {
   const elements$ = React.useMemo(
     () =>
       tokensSource.visibleElementStacks$.pipe(
-        filterHasAnyAspect(furnishingAspects)
+        filterHasAnyAspect(furnishingAspects),
       ),
-    [tokensSource]
+    [tokensSource],
   );
 
   const columns = React.useMemo(
@@ -31,6 +31,9 @@ const FurnishingsCatalogPage = () => {
         id: "focus-button",
         header: "",
         size: 50,
+        meta: {
+          columnName: "Focus",
+        },
         cell: ({ row }) => (
           <Box
             sx={{
@@ -56,7 +59,7 @@ const FurnishingsCatalogPage = () => {
       }),
       columnHelper.description(),
     ],
-    []
+    [],
   );
 
   return (

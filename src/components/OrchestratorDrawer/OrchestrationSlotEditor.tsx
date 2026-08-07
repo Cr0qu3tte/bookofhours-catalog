@@ -29,22 +29,21 @@ const OrchestrationSlotEditor = React.memo(
       useObservation(
         () =>
           slot.assignment$.pipe(switchMap((stack) => stack?.aspects$ ?? Null$)),
-        [slot]
+        [slot],
       ) ?? {};
 
     const recipeRequirements =
       useObservation(orchestration.requirements$) ?? null;
     const recipeRequiredAspects = React.useMemo(
       () => Object.keys(recipeRequirements ?? {}),
-      [recipeRequirements]
+      [recipeRequirements],
     );
 
     const slotContributingAspects = React.useMemo(
       () => pick(assignmentAspects, recipeRequiredAspects),
-      [recipeRequiredAspects]
+      [recipeRequiredAspects],
     );
 
-    // Remove the power aspects from these since that will be displayed by the workstation hints.
     const requiredAspects = Object.keys(slot.spec.required);
     const essentialAspects = Object.keys(slot.spec.essential);
 
@@ -54,7 +53,7 @@ const OrchestrationSlotEditor = React.memo(
         fullWidth
         label={slot.spec.label}
         helperText={
-          <Stack direction="column" gap={1}>
+          <Stack direction="column" gap={1} sx={{ mt: 0.5 }}>
             {requiredAspects.length > 0 && (
               <Stack direction="row" gap={1}>
                 <Typography component="span" sx={{ mr: "auto" }}>
@@ -98,7 +97,7 @@ const OrchestrationSlotEditor = React.memo(
         autoFocus={autoFocus}
       />
     );
-  }
+  },
 );
 
 export default OrchestrationSlotEditor;

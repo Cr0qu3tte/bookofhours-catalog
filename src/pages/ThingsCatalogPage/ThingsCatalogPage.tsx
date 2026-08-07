@@ -25,9 +25,9 @@ const ThingsCatalogPage = () => {
     () =>
       tokensSource.visibleElementStacks$.pipe(
         filterHasAnyAspect("thing"),
-        filterHasNoneOfAspect("readable")
+        filterHasNoneOfAspect("readable"),
       ),
-    [tokensSource]
+    [tokensSource],
   );
 
   const columns = React.useMemo(
@@ -36,6 +36,9 @@ const ThingsCatalogPage = () => {
         id: "focus-button",
         header: "",
         size: 50,
+        meta: {
+          columnName: "Focus",
+        },
         cell: ({ row }) => (
           <Box
             sx={{
@@ -56,7 +59,7 @@ const ThingsCatalogPage = () => {
       }),
       columnHelper.description(),
     ],
-    []
+    [],
   );
 
   return (

@@ -30,7 +30,7 @@ const SeasonAndTimeHeader = ({ sx }: SeasonAndTimeHeaderProps) => {
   //Adding 8s to account for the weather card drawing
   secondsToTomorrow += 8;
   const secondsToTomorrowStr = secondsToTomorrow.toFixed(
-    secondsToTomorrow > 60 ? 0 : 1
+    secondsToTomorrow > 60 ? 0 : 1,
   );
 
   const secondsToNextEvent =
@@ -38,12 +38,12 @@ const SeasonAndTimeHeader = ({ sx }: SeasonAndTimeHeaderProps) => {
       () =>
         tokensSource.visibleSituations$.pipe(
           observeAllMap((s) => s.timeRemaining$),
-          map((seconds) => Math.max(...seconds.filter((x) => x > 0)))
+          map((seconds) => Math.max(...seconds.filter((x) => x > 0))),
         ),
-      [tokensSource.visibleSituations$]
+      [tokensSource.visibleSituations$],
     ) ?? Number.NaN;
   const secondsToNextEventStr = secondsToNextEvent.toFixed(
-    secondsToNextEvent > 60 ? 0 : 1
+    secondsToNextEvent > 60 ? 0 : 1,
   );
 
   const hasSecondsToTomorrow = !Number.isNaN(secondsToTomorrow);

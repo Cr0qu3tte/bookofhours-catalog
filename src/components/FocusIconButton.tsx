@@ -16,8 +16,20 @@ const FocusIconButton = ({ token }: FocusIconButtonProps) => {
     token.focus();
   }, []);
 
+  const onKeyUp = React.useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.stopPropagation();
+      token.focus();
+    }
+  }, []);
+
   return (
-    <IconButton title="Focus Camera on Item" onClick={onClick}>
+    <IconButton
+      title="Focus Camera on Item"
+      onClick={onClick}
+      onKeyUp={onKeyUp}
+    >
       <VisibilityIcon />
     </IconButton>
   );

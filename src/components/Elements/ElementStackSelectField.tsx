@@ -52,19 +52,19 @@ interface ElementStackAutocompleteItem {
 }
 
 function observeAutocompleteItem(
-  model: ElementStackModel
+  model: ElementStackModel,
 ): Observable<ElementStackAutocompleteItem> {
   return combineLatest([model.label$, model.inExteriorSphere$]).pipe(
     map(([label, exterior]) => ({
       label,
       elementStack: model,
       exterior,
-    }))
+    })),
   );
 }
 
 const defaultFilterOptions = createFilterOptions<ElementStackAutocompleteItem>(
-  {}
+  {},
 );
 
 const ElementStackSelectField = ({
@@ -83,7 +83,7 @@ const ElementStackSelectField = ({
   let items =
     useObservation(
       () => elementStacks$.pipe(observeAllMap(observeAutocompleteItem)),
-      [elementStacks$]
+      [elementStacks$],
     ) ?? null;
 
   const [{ canDrop, isOver, dropElementStack }, drop] = useDrop(
@@ -91,7 +91,7 @@ const ElementStackSelectField = ({
       accept: ElementStackDraggable,
       canDrop: (draggable: ElementStackDraggable) => {
         const item = items?.find(
-          (x) => x.elementStack === draggable.elementStack
+          (x) => x.elementStack === draggable.elementStack,
         );
         if (!item) {
           return false;
@@ -117,43 +117,42 @@ const ElementStackSelectField = ({
           monitor.getItem<ElementStackDraggable>()?.elementStack,
       }),
     }),
-    [items, requireExterior]
+    [items, requireExterior],
   );
 
   const [matchCount, setMatchCount] = React.useState(0);
   const filterOptions = React.useCallback(
     (
       options: ElementStackAutocompleteItem[],
-      state: FilterOptionsState<ElementStackAutocompleteItem>
+      state: FilterOptionsState<ElementStackAutocompleteItem>,
     ) => {
       const result = defaultFilterOptions(options, state);
       setMatchCount(result.length);
       return result.slice(0, 24);
     },
-    []
+    [],
   );
 
   const PaperComponent = React.useMemo(
     () =>
-      ({ children }: React.HTMLAttributes<HTMLElement>) =>
-        (
-          <Paper>
-            {children}
-            {matchCount > 25 && (
-              <Stack sx={{ width: "100%", p: 1 }} alignItems="center">
-                <Typography
-                  sx={{ mx: "auto" }}
-                  textAlign="center"
-                  variant="caption"
-                >
-                  Showing 25 of {matchCount} matching cards. Use search to
-                  refine the results.
-                </Typography>
-              </Stack>
-            )}
-          </Paper>
-        ),
-    [matchCount, items]
+      ({ children }: React.HTMLAttributes<HTMLElement>) => (
+        <Paper>
+          {children}
+          {matchCount > 25 && (
+            <Stack sx={{ width: "100%", p: 1 }} alignItems="center">
+              <Typography
+                sx={{ mx: "auto" }}
+                textAlign="center"
+                variant="caption"
+              >
+                Showing 25 of {matchCount} matching cards. Use search to refine
+                the results.
+              </Typography>
+            </Stack>
+          )}
+        </Paper>
+      ),
+    [matchCount, items],
   );
 
   if (!items) {
@@ -185,7 +184,7 @@ const ElementStackSelectField = ({
       getOptionDisabled={(option) => requireExterior && !option.exterior}
       value={selectedValue}
       onChange={(_, value) => onChange(value?.elementStack ?? null)}
-      componentsProps={{
+      slotProps={{
         // Neither of these have titles, and NVDA reads both.
         // Not sure about other screen readers
         clearIndicator: { "aria-label": "" },
@@ -206,38 +205,38 @@ const ElementStackSelectField = ({
           }}
           autoFocus={autoFocus}
           label={label}
-          // Hack: Orchestration slots need to put divs in helperText, and FormHelperText defaults to a p tag
-          // FIXME: We should accept the requirements data ourselves and render it in a standard way
-          // rather than having it passed in as helperText.
-          // This would be useful to reuse for unlock dialog.
-          FormHelperTextProps={{
-            component: "div",
+          slotProps={{
+            // Hack: Orchestration slots need to put divs in helperText, and FormHelperText defaults to a p tag
+            // FIXME: We should accept the requirements data ourselves and render it in a standard way
+            // rather than having it passed in as helperText.
+            // This would be useful to reuse for unlock dialog.
+            formHelperText: { component: "div" },
+            input: {
+              ...params.InputProps,
+              startAdornment: (
+                <InputAdornment position="start" aria-hidden="true">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      height: "100%",
+                      width: "30px",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {selectedElementId && (
+                      <ElementIcon
+                        maxWidth={30}
+                        maxHeight={30}
+                        elementId={selectedElementId}
+                      />
+                    )}
+                  </Box>
+                </InputAdornment>
+              ),
+            },
           }}
           helperText={helperText}
-          InputProps={{
-            ...params.InputProps,
-            startAdornment: (
-              <InputAdornment position="start" aria-hidden="true">
-                <Box
-                  sx={{
-                    display: "flex",
-                    height: "100%",
-                    width: "30px",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {selectedElementId && (
-                    <ElementIcon
-                      maxWidth={30}
-                      maxHeight={30}
-                      elementId={selectedElementId}
-                    />
-                  )}
-                </Box>
-              </InputAdornment>
-            ),
-          }}
         />
       )}
       renderOption={(props, option) => (

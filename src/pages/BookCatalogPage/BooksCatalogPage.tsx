@@ -22,6 +22,10 @@ const columns = [
   columnHelper.display({
     id: "book-commands",
     size: 50,
+    header: "",
+    meta: {
+      columnName: "Commands",
+    },
     cell: (props) => {
       return (
         <Stack direction="column" alignItems="center">
@@ -34,7 +38,7 @@ const columns = [
       );
     },
   }),
-  columnHelper.elementStackIcon(),
+  columnHelper.elementStackIcon("Book Icon"),
   columnHelper.label(),
   columnHelper.location(),
   columnHelper.aspectsList("period", (s) => s.startsWith("period."), {
@@ -62,9 +66,12 @@ const columns = [
   columnHelper.display({
     id: "memory-commands",
     size: 50,
+    meta: {
+      columnName: "Pin Memory",
+    },
     cell: (props) => {
       const memoryElementId = useObservation(
-        props.row.original.memoryElementId$
+        props.row.original.memoryElementId$,
       );
       return (
         <Box
@@ -87,6 +94,9 @@ const columns = [
     size: 100,
     enableSorting: false,
     enableColumnFilter: false,
+    meta: {
+      columnName: "Memory Icon",
+    },
     cell: ElementIconCell,
   }),
   columnHelper.observeText("memoryLabel$", {

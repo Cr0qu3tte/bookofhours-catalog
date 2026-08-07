@@ -2,7 +2,7 @@ import React from "react";
 
 import { useDIDependency } from "@/container";
 
-import { useNativeEvent } from "@/hooks/native-event";
+import { useNativeEvent } from "@/hooks/use-native-event";
 
 import { SearchService } from "@/services/search";
 import { Orchestrator } from "@/services/sh-game";
@@ -31,7 +31,7 @@ const Hotkeys = ({ children }: HotkeysProps) => {
         }
       }
     },
-    [searchService, orchestrator]
+    [searchService, orchestrator],
   );
 
   useNativeEvent(document, "keydown", onKeyDown);

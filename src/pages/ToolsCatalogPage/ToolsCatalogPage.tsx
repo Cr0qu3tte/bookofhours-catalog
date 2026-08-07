@@ -19,7 +19,7 @@ const ToolsCatalogPage = () => {
 
   const elements$ = React.useMemo(
     () => tokensSource.visibleElementStacks$.pipe(filterHasAnyAspect("tool")),
-    [tokensSource]
+    [tokensSource],
   );
 
   const columns = React.useMemo(
@@ -28,6 +28,9 @@ const ToolsCatalogPage = () => {
         id: "focus-button",
         header: "",
         size: 50,
+        meta: {
+          columnName: "Focus",
+        },
         cell: ({ row }) => (
           <Box
             sx={{
@@ -53,7 +56,7 @@ const ToolsCatalogPage = () => {
       }),
       columnHelper.description(),
     ],
-    []
+    [],
   );
 
   return <DataGridPage title="Toolshed" columns={columns} items$={elements$} />;

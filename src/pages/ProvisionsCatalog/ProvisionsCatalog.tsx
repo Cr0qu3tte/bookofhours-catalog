@@ -20,9 +20,9 @@ const ProvisionsCatalog = () => {
   const elements$ = React.useMemo(
     () =>
       tokensSource.visibleElementStacks$.pipe(
-        filterHasAnyAspect(provisionsAspects)
+        filterHasAnyAspect(provisionsAspects),
       ),
-    [tokensSource]
+    [tokensSource],
   );
 
   const columns = React.useMemo(
@@ -31,6 +31,9 @@ const ProvisionsCatalog = () => {
         id: "focus-button",
         header: "",
         size: 50,
+        meta: {
+          columnName: "Focus",
+        },
         cell: ({ row }) => (
           <Box
             sx={{
@@ -62,7 +65,7 @@ const ProvisionsCatalog = () => {
       }),
       columnHelper.description(),
     ],
-    []
+    [],
   );
 
   return (

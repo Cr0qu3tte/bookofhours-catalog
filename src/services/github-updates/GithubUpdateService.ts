@@ -3,7 +3,7 @@ import { inject, injectable, singleton } from "microinject";
 
 import { version } from "@/runtime-env";
 import { GithubRelease, getGithubReleases } from "@/github";
-import { promiseFuncToObservable } from "@/observables";
+import { EmptyArray$, promiseFuncToObservable } from "@/observables";
 
 import { SettingsManager } from "../settings";
 
@@ -11,7 +11,7 @@ import { SettingsManager } from "../settings";
 @singleton()
 export class GithubUpdateService {
   constructor(
-    @inject(SettingsManager) private _settingsManager: SettingsManager
+    @inject(SettingsManager) private _settingsManager: SettingsManager,
   ) {}
 
   private _githubReleases: Observable<GithubRelease[]> | null = null;
@@ -44,7 +44,7 @@ export class GithubUpdateService {
           }
 
           return latestRelease;
-        })
+        }),
       );
     }
 
@@ -68,7 +68,7 @@ export class GithubUpdateService {
           }
 
           return true;
-        })
+        }),
       );
     }
 

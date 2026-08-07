@@ -60,10 +60,13 @@ const ConfigureTableMenu: React.FC<ConfigureTableMenuProps> = ({
 
   const toggleAllVisibility = React.useCallback(() => {
     table.setColumnVisibility(
-      columns.reduce((acc, c) => {
-        acc[c.id] = !allVisible;
-        return acc;
-      }, {} as Record<string, any>)
+      columns.reduce(
+        (acc, c) => {
+          acc[c.id] = !allVisible;
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
     );
   }, [columns, allVisible, table]);
 
@@ -71,7 +74,7 @@ const ConfigureTableMenu: React.FC<ConfigureTableMenuProps> = ({
     <Popover open={anchorEl != null} anchorEl={anchorEl} onClose={onClose}>
       <Paper sx={{ p: 1 }}>
         <Stack direction="column" alignItems="center">
-          <Typography variant="h5">Column Visibility</Typography>
+          <Typography variant="h6">Column Visibility</Typography>
           <Button onClick={toggleAllVisibility}>
             {allVisible ? "Hide All" : "Show All"}
           </Button>
@@ -80,7 +83,10 @@ const ConfigureTableMenu: React.FC<ConfigureTableMenuProps> = ({
               // This can be functions, but im not sure how to invoke / resolve it.
               // The API docs for column visibility just use .header raw...
               .filter(
-                (c) => typeof c.columnDef.header === "string" && c.getCanHide()
+                (c) =>
+                  typeof (
+                    c.columnDef.meta?.columnName ?? c.columnDef.header
+                  ) === "string" && c.getCanHide(),
               )
               .map((column) => (
                 <FormControlLabel
@@ -91,7 +97,10 @@ const ConfigureTableMenu: React.FC<ConfigureTableMenuProps> = ({
                       onChange={column.getToggleVisibilityHandler()}
                     />
                   }
-                  label={String(column.columnDef.header)}
+                  label={String(
+                    column.columnDef.meta?.columnName ??
+                      column.columnDef.header,
+                  )}
                 />
               ))}
           </FormGroup>
