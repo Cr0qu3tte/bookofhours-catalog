@@ -96,6 +96,19 @@ export const wisdomAspects = [
   "w.preservation",
 ] as const;
 
+export const attunementAspects = [
+  "a.xhausted", // Attunement Fulfilled
+  "a.xcho", // Chor
+  "a.xere", // Ereb
+  "a.xfet", // Fet
+  "a.xhea", // Health
+  "a.xmet", // Mettle
+  "a.xpho", // Phost
+  "a.xsha", // Shapt
+  "a.xtri", // Trist
+  "a.xwis", // Wist
+] as const;
+
 export function aspectsMagnitude(aspects: Aspects): number {
   return Math.sqrt(
     Object.values(aspects).reduce((sum, value) => sum + value * value, 0),

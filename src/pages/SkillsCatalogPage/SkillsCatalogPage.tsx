@@ -7,7 +7,7 @@ import UpgradeIcon from "@mui/icons-material/Upgrade";
 
 import { useDIDependency } from "@/container";
 
-import { powerAspects, wisdomAspects } from "@/aspects";
+import { attunementAspects, powerAspects, wisdomAspects } from "@/aspects";
 
 import {
   CharacterSource,
@@ -91,7 +91,7 @@ const SkillsCatalogPage = () => {
         showLevel: false,
         size: 190,
       }),
-      columnHelper.aspectsList("attuned", ["a.xhausted"], {
+      columnHelper.aspectsList("attuned", attunementAspects, {
         header: "Attuned",
         showLevel: false,
         size: 160,
