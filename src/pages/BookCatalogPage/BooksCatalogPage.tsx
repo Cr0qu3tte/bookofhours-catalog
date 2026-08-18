@@ -57,6 +57,12 @@ const columns = [
     showLevel: false,
     enableSorting: false,
   }),
+  columnHelper.aspectsList("subject", (s) => s.startsWith("r."), {
+    header: "Subject",
+    size: 125,
+    showLevel: false,
+    enableSorting: false,
+  }),
   columnHelper.aspectsList("attributes", isBookAtributeAspect, {
     header: "Attributes",
     size: 200,
@@ -109,7 +115,6 @@ const columns = [
     size: 260,
     aspectsSource: (model) => model.memoryAspects$,
   }),
-  columnHelper.description(),
 ];
 
 const BookCatalogPage = () => {
