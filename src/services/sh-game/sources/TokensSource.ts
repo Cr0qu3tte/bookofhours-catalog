@@ -226,7 +226,6 @@ export class TokensSource {
         map((situations) =>
           situations.filter(
             (x) =>
-              !x.verbId.startsWith("library.bed.") &&
               !x.verbId.startsWith("garden.") &&
               x.verbId != "world.beachcombing",
           ),
