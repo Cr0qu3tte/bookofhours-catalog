@@ -72,12 +72,12 @@ const OrchestrationListContent = () => {
     "Dusk",
     "Night",
   ];
-  let secondsToNextPeriod = Math.floor(secondsToTomorrow % 60 + 0.1);
+  let secondsToNextPeriod = Math.floor((secondsToTomorrow % 60) + 0.1);
 
   let nextPeriodIndex = Math.ceil((360 - secondsToTomorrow) / 60);
   // if next period is after Night, we loop to Dawn
   if (nextPeriodIndex >= dayPeriodNames.length) {
-      nextPeriodIndex = 0;
+    nextPeriodIndex = 0;
   }
   const nextPeriodName = dayPeriodNames[nextPeriodIndex];
 
@@ -111,21 +111,21 @@ const OrchestrationListContent = () => {
               </Box>
             </ListItem>
             <ListItem>
-                <ListItemText primary={`Skip to ${nextPeriodName}`} />
-                <Box sx={{ ml: "auto" }}>
-                    <Typography variant="caption" role="timer">
-                        <ScreenReaderContent>
-                            {secondsToTomorrowStr} seconds to {nextPeriodName}
-                        </ScreenReaderContent>
-                        <span aria-hidden="true">{secondsToNextPeriod}s</span>
-                    </Typography>
-                    <IconButton
-                        title="Skip to Tomorrow"
-                        onClick={() => timeSource.passToNextPeriod()}
-                    >
-                        <SkipNextIcon />
-                    </IconButton>
-                </Box>
+              <ListItemText primary={`Skip to ${nextPeriodName}`} />
+              <Box sx={{ ml: "auto" }}>
+                <Typography variant="caption" role="timer">
+                  <ScreenReaderContent>
+                    {secondsToTomorrowStr} seconds to {nextPeriodName}
+                  </ScreenReaderContent>
+                  <span aria-hidden="true">{secondsToNextPeriod}s</span>
+                </Typography>
+                <IconButton
+                  title="Skip to Tomorrow"
+                  onClick={() => timeSource.passToNextPeriod()}
+                >
+                  <SkipNextIcon />
+                </IconButton>
+              </Box>
             </ListItem>
             <Divider aria-hidden="true" orientation="horizontal" />
           </>
@@ -255,7 +255,7 @@ const SituationListItem = ({ situation }: SituationListItemProps) => {
           ),
         );
         const match = values(slots).find((slot) =>
-          aspectsMatchRequirements(item.elementStack.aspects, slot.spec),
+          aspectsMatchRequirements(item.elementStack.aspectsAndSelf, slot.spec),
         );
         if (!match) {
           return;

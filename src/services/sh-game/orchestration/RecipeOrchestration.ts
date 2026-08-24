@@ -284,12 +284,19 @@ export class RecipeOrchestration
     spec: SphereSpec,
   ): Observable<boolean> {
     const requirementKeys = Object.keys(this._recipe.requirements);
-    // Our recipe is fixed, so filter candidates by its requirements.
+    // Check if element matches recipe requirements OR slot requirements
     return elementStack.aspectsAndSelf$.pipe(
       map((aspects) => {
-        return Object.keys(aspects).some((aspect) =>
+        const hasRecipeMatch = Object.keys(aspects).some((aspect) =>
           requirementKeys.includes(aspect),
         );
+        // Also check if element matches the slot's required aspects
+        // The spec has a 'required' property which is an Aspects object (key-value pairs)
+        const specRequiredAspects = Object.keys(spec.required || {});
+        const hasSlotMatch = Object.keys(aspects).some((aspect) =>
+          specRequiredAspects.includes(aspect),
+        );
+        return hasRecipeMatch || hasSlotMatch;
       }),
     );
   }

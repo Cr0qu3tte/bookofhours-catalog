@@ -336,7 +336,7 @@ export abstract class OrchestrationBaseImpl implements OrchestrationBase {
           this._createSlotCandidateFilter(item, spec),
         ),
         filterItemObservations((item) =>
-          item.aspects$.pipe(
+          item.aspectsAndSelf$.pipe(
             map((aspects) => aspectsMatchRequirements(aspects, spec)),
           ),
         ),
