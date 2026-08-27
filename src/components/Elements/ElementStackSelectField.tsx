@@ -15,6 +15,7 @@ import {
   FilterOptionsState,
   Paper,
   Stack,
+  Chip,
 } from "@mui/material";
 
 import { observeAllMap } from "@/observables";
@@ -51,6 +52,14 @@ interface ElementStackAutocompleteItem {
   exterior: boolean;
 }
 
+interface ElementStackAutocompleteGroupItem {
+  label: string;
+  representative: ElementStackModel;
+  instances: ElementStackModel[];
+  count: number;
+  exterior: boolean;
+}
+
 function observeAutocompleteItem(
   model: ElementStackModel,
 ): Observable<ElementStackAutocompleteItem> {
@@ -63,9 +72,42 @@ function observeAutocompleteItem(
   );
 }
 
-const defaultFilterOptions = createFilterOptions<ElementStackAutocompleteItem>(
-  {},
-);
+function groupAutocompleteItems(
+  items: readonly ElementStackAutocompleteItem[],
+): ElementStackAutocompleteGroupItem[] {
+  const groups = new Map<string, ElementStackAutocompleteItem[]>();
+
+  for (const item of items) {
+    if (item.label == null) {
+      continue;
+    }
+    const elementId = item.elementStack.elementId;
+    const existing = groups.get(elementId);
+    if (existing) {
+      existing.push(item);
+    } else {
+      groups.set(elementId, [item]);
+    }
+  }
+
+  const result: ElementStackAutocompleteGroupItem[] = [];
+  for (const groupItems of groups.values()) {
+    const representativeItem = groupItems[0];
+    const baseLabel = representativeItem.label ?? "";
+    result.push({
+      label: baseLabel,
+      representative: representativeItem.elementStack,
+      instances: groupItems.map((g) => g.elementStack),
+      count: groupItems.length,
+      exterior: groupItems.some((g) => g.exterior),
+    });
+  }
+
+  return result;
+}
+
+const defaultFilterOptions =
+  createFilterOptions<ElementStackAutocompleteGroupItem>({});
 
 const ElementStackSelectField = ({
   sx,
@@ -86,12 +128,18 @@ const ElementStackSelectField = ({
       [elementStacks$],
     ) ?? null;
 
+  // Group items by elementId to consolidate duplicates
+  const groupedItems = React.useMemo(() => {
+    if (!items) return [];
+    return groupAutocompleteItems(items);
+  }, [items]);
+
   const [{ canDrop, isOver, dropElementStack }, drop] = useDrop(
     () => ({
       accept: ElementStackDraggable,
       canDrop: (draggable: ElementStackDraggable) => {
-        const item = items?.find(
-          (x) => x.elementStack === draggable.elementStack,
+        const item = groupedItems?.find(
+          (x) => x.representative === draggable.elementStack,
         );
         if (!item) {
           return false;
@@ -117,14 +165,14 @@ const ElementStackSelectField = ({
           monitor.getItem<ElementStackDraggable>()?.elementStack,
       }),
     }),
-    [items, requireExterior],
+    [groupedItems, requireExterior],
   );
 
   const [matchCount, setMatchCount] = React.useState(0);
   const filterOptions = React.useCallback(
     (
-      options: ElementStackAutocompleteItem[],
-      state: FilterOptionsState<ElementStackAutocompleteItem>,
+      options: ElementStackAutocompleteGroupItem[],
+      state: FilterOptionsState<ElementStackAutocompleteGroupItem>,
     ) => {
       const result = defaultFilterOptions(options, state);
       setMatchCount(result.length);
@@ -152,38 +200,37 @@ const ElementStackSelectField = ({
           )}
         </Paper>
       ),
-    [matchCount, items],
+    [matchCount, groupedItems],
   );
 
-  if (!items) {
+  if (!groupedItems) {
     return <CircularProgress color="inherit" />;
   }
 
-  items = items.filter((x) => x.label != null) ?? null;
-
   let selectedValue =
-    items.find(({ elementStack }) => elementStack === value) ?? null;
+    groupedItems.find(({ representative }) => representative === value) ?? null;
 
   if (canDrop && isOver && dropElementStack) {
     selectedValue =
-      items.find(({ elementStack }) => elementStack === dropElementStack) ??
-      null;
+      groupedItems.find(
+        ({ representative }) => representative === dropElementStack,
+      ) ?? null;
   }
 
-  const selectedElementId = selectedValue?.elementStack.elementId ?? null;
+  const selectedElementId = selectedValue?.representative.elementId ?? null;
 
   return (
     <Autocomplete
       sx={sx}
       fullWidth={fullWidth}
-      options={items}
+      options={groupedItems}
       filterOptions={filterOptions}
       readOnly={readOnly}
       autoHighlight
-      getOptionLabel={(option) => option.label!}
+      getOptionLabel={(option) => option.label}
       getOptionDisabled={(option) => requireExterior && !option.exterior}
       value={selectedValue}
-      onChange={(_, value) => onChange(value?.elementStack ?? null)}
+      onChange={(_, value) => onChange(value?.representative ?? null)}
       slotProps={{
         // Neither of these have titles, and NVDA reads both.
         // Not sure about other screen readers
@@ -241,7 +288,7 @@ const ElementStackSelectField = ({
       )}
       renderOption={(props, option) => (
         <ElementStackSelectItem
-          key={option.elementStack.id}
+          key={option.representative.id}
           props={props}
           displayAspects={displayAspects}
           {...option}
@@ -254,7 +301,8 @@ const ElementStackSelectField = ({
 
 export default ElementStackSelectField;
 
-interface ElementStackSelectItemProps extends ElementStackAutocompleteItem {
+interface ElementStackSelectItemProps
+  extends ElementStackAutocompleteGroupItem {
   props: any;
   displayAspects?: readonly string[];
 }
@@ -262,25 +310,26 @@ interface ElementStackSelectItemProps extends ElementStackAutocompleteItem {
 const ElementStackSelectItem = ({
   props,
   label,
-  elementStack,
+  representative,
+  count,
   displayAspects,
 }: ElementStackSelectItemProps) => {
-  let aspects = useObservation(elementStack.aspects$);
-  const iconUrl = useObservation(elementStack.iconUrl$);
+  const aspects = useObservation(representative.aspects$);
+  const iconUrl = useObservation(representative.iconUrl$);
 
   if (!label || !aspects) {
     return null;
   }
 
-  if (displayAspects) {
-    aspects = pick(aspects, displayAspects);
-  }
+  const selectedAspects = displayAspects
+    ? pick(aspects, displayAspects)
+    : aspects;
 
   return (
     <Box component="li" sx={{ width: "100%" }} {...props}>
       <Tooltip
         sx={{ display: "flex", flexDirection: "row", gap: 1, width: "100%" }}
-        title={<ElementStackDetails elementStack={elementStack} />}
+        title={<ElementStackDetails elementStack={representative} />}
       >
         <Box
           sx={{
@@ -311,13 +360,26 @@ const ElementStackSelectItem = ({
               }}
             />
           </Box>
-          {/* FIXME: Shrink this text to fit the aspects in.  Not working for some reason. */}
           <Typography
             variant="body1"
             sx={{ flex: "1 1", textOverflow: "ellipsis", minWidth: 0 }}
           >
             {label}
           </Typography>
+          {count > 1 && (
+            <Chip
+              size="small"
+              label={count}
+              sx={{
+                minWidth: 24,
+                height: 24,
+                fontSize: "0.75rem",
+                fontWeight: "bold",
+              }}
+              color="primary"
+              variant="outlined"
+            />
+          )}
         </Box>
         <Box
           sx={{
@@ -329,7 +391,7 @@ const ElementStackSelectItem = ({
         >
           <AspectsList
             sx={{ flexWrap: "nowrap" }}
-            aspects={aspects}
+            aspects={selectedAspects}
             iconSize={30}
           />
         </Box>
