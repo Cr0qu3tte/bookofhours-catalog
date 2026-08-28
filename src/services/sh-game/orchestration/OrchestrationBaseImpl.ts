@@ -248,8 +248,26 @@ export abstract class OrchestrationBaseImpl implements OrchestrationBase {
           (x) =>
             !values(assignments).includes(x) &&
             aspectsMatchRequirements(x.aspectsAndSelf, spec) &&
-            elementStackContributes(x),
+            (spec.id === "language" || elementStackContributes(x)),
         );
+
+        // Language slot autofill: if exactly one candidate exists and slot is not greedy, auto-select it
+        if (spec.id === "language" && !spec.greedy && candidates.length > 0) {
+          const slotSuccess = await situation.setSlotContents(
+            spec.id,
+            candidates[0],
+          );
+          if (slotSuccess) {
+            // Update our local tracking
+            aspectContents = combineAspects(
+              aspectContents,
+              candidates[0].aspectsAndSelf,
+            );
+            assignments[spec.id] = candidates[0];
+            // Continue to next threshold
+            continue;
+          }
+        }
 
         if (candidates.length === 0) {
           continue;

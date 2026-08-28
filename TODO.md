@@ -21,8 +21,6 @@
 
   - Recipe executor can make use of flipped over cards, confusing the game
 
-- Autofill orchestration for reading books doesnt pull in the language
-
 ## DLC
 
 - Recipe list for foods and such
