@@ -96,6 +96,14 @@ const SkillsCatalogPage = () => {
         showLevel: false,
         size: 160,
       }),
+      columnHelper.aspectsList(
+        "effective",
+        (s) => s.startsWith("effective.contamination."),
+        {
+          header: "Effective",
+          size: 175,
+        },
+      ),
       columnHelper.description(),
     ],
     [],
