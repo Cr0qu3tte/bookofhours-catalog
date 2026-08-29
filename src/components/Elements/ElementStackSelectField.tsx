@@ -155,14 +155,16 @@ const ElementStackSelectField = ({
     () => ({
       accept: ElementStackDraggable,
       canDrop: (draggable: ElementStackDraggable) => {
-        const item = groupedItems?.find(
-          (x) => x.representative === draggable.elementStack,
+        // Find the group that contains this specific elementStack
+        const group = groupedItems?.find((g) =>
+          g.instances.includes(draggable.elementStack),
         );
-        if (!item) {
+        if (!group) {
           return false;
         }
 
-        if (requireExterior && !item.exterior) {
+        // Check if the specific item being dropped is in exterior sphere
+        if (requireExterior && !draggable.elementStack.inExteriorSphere) {
           return false;
         }
 
