@@ -76,6 +76,10 @@ export abstract class TokenModel<T extends Token = any> {
     return this._token.spherePath;
   }
 
+  get inExteriorSphere() {
+    return this._token.inExteriorSphere;
+  }
+
   private _inExteriorSphere$: Observable<boolean> | null = null;
   get inExteriorSphere$() {
     if (!this._inExteriorSphere$) {

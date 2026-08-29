@@ -72,21 +72,21 @@ function observeAutocompleteItem(
   );
 }
 
-function groupAutocompleteItems(
-  items: readonly ElementStackAutocompleteItem[],
+function groupAutocompleteItemsFromStacks(
+  stacks: readonly ElementStackModel[],
 ): ElementStackAutocompleteGroupItem[] {
-  const groups = new Map<string, ElementStackAutocompleteItem[]>();
+  const groups = new Map<string, ElementStackModel[]>();
 
-  for (const item of items) {
-    if (item.label == null) {
+  for (const stack of stacks) {
+    if (stack.label == null) {
       continue;
     }
-    const elementId = item.elementStack.elementId;
+    const elementId = stack.elementId;
     const existing = groups.get(elementId);
     if (existing) {
-      existing.push(item);
+      existing.push(stack);
     } else {
-      groups.set(elementId, [item]);
+      groups.set(elementId, [stack]);
     }
   }
 
@@ -94,12 +94,21 @@ function groupAutocompleteItems(
   for (const groupItems of groups.values()) {
     const representativeItem = groupItems[0];
     const baseLabel = representativeItem.label ?? "";
+    // Only sum quantities from stacks that are in the exterior sphere (on the board),
+    // not those inside verb/situation spheres that are "being used"
+    const availableStacks = groupItems.filter((g) => g.inExteriorSphere);
+    // Sum the quantity across all available/exterior stacks in this group
+    const totalQuantity = availableStacks.reduce(
+      (sum, g) => sum + g.quantity,
+      0,
+    );
+
     result.push({
       label: baseLabel,
-      representative: representativeItem.elementStack,
-      instances: groupItems.map((g) => g.elementStack),
-      count: groupItems.length,
-      exterior: groupItems.some((g) => g.exterior),
+      representative: representativeItem,
+      instances: groupItems.map((g) => g),
+      count: totalQuantity,
+      exterior: groupItems.some((g) => g.inExteriorSphere),
     });
   }
 
@@ -128,11 +137,19 @@ const ElementStackSelectField = ({
       [elementStacks$],
     ) ?? null;
 
-  // Group items by elementId to consolidate duplicates
+  // Raw element stacks — used for accurate grouping/counting (avoids partial array issues from mapArrayItemsCached)
+  const rawElementStacks$ =
+    useObservation(() => elementStacks$, [elementStacks$]) ?? null;
+
+  // Group items by elementId using raw stacks for accurate counts
+  // Use items for reactive label$/exterior$ values, and raw stacks for grouping/instances
   const groupedItems = React.useMemo(() => {
-    if (!items) return [];
-    return groupAutocompleteItems(items);
-  }, [items]);
+    if (!rawElementStacks$) {
+      return [];
+    }
+
+    return groupAutocompleteItemsFromStacks(rawElementStacks$);
+  }, [rawElementStacks$]);
 
   const [{ canDrop, isOver, dropElementStack }, drop] = useDrop(
     () => ({

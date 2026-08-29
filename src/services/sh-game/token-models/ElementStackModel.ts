@@ -179,6 +179,10 @@ export class ElementStackModel
     return this._quantity$;
   }
 
+  get quantity() {
+    return this._token.quantity;
+  }
+
   private _iconUrl$: Observable<string> | null = null;
   get iconUrl$() {
     if (!this._iconUrl$) {
