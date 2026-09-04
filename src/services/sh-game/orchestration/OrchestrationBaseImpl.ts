@@ -248,7 +248,9 @@ export abstract class OrchestrationBaseImpl implements OrchestrationBase {
           (x) =>
             !values(assignments).includes(x) &&
             aspectsMatchRequirements(x.aspectsAndSelf, spec) &&
-            (spec.id === "language" || elementStackContributes(x)),
+            (spec.id === "language" ||
+              elementStackContributes(x) ||
+              (spec.required && Object.keys(spec.required).includes("skill"))),
         );
 
         // Language slot autofill: if exactly one candidate exists and slot is not greedy, auto-select it
